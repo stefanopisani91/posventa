@@ -27,9 +27,9 @@ export const LEGAL_RULES = {
     /** Art. 104.b — counted from the day the consumer takes physical possession. */
     countsFrom: "delivery",
     /**
-     * Customer-favourable reading of Recital 41 of Directive 2011/83/EU
-     * (Regulation 1182/71): a period ending on Saturday or Sunday ends on the
-     * next working day. Public holidays are not modelled.
+     * Directive 2011/83/EU, recital 41, applies Regulation 1182/71: the delivery
+     * day is not counted, and (art. 3(4)) a period ending on Saturday or Sunday
+     * ends on the next working day. Public holidays are not modelled.
      */
     extendWhenEndingOnWeekend: true,
     /** Art. 102.1 — the consumer does not have to give a reason. */

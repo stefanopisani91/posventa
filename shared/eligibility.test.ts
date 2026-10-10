@@ -72,7 +72,7 @@ describe("calendar helpers", () => {
 });
 
 describe("right of withdrawal (14 calendar days from delivery)", () => {
-  it("matches the European Commission example: delivered 1 March, last day 15 March", () => {
+  it("does not count the delivery day: delivered 1 March, last day 15 March", () => {
     expect(withdrawalLastDay("2027-03-01")).toBe("2027-03-15");
   });
 

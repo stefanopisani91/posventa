@@ -32,11 +32,11 @@ TypeScript rather than JSON so each value can carry its article reference and
 so both the browser and the Functions import the very same object.
 
 **D5. How the 14-day withdrawal deadline is counted.** The day of delivery is
-day 0; the last day to withdraw is delivery + 14 calendar days (the European
-Commission's guidance gives "delivered 1 March → last day 15 March"). If that
-last day is a Saturday or Sunday it is moved to the following Monday. This
-follows Recital 41 of Directive 2011/83/EU (which applies Regulation
-1182/71) and is never worse for the customer. National/regional public
+day 0; the last day to withdraw is delivery + 14 calendar days (delivered
+1 March → last day 15 March). Recital 41 of Directive 2011/83/EU (checked on
+EUR-Lex) says the day of the event is not counted and that Regulation 1182/71
+applies. If the last day is a Saturday or Sunday it is moved to the following
+Monday (Regulation 1182/71, art. 3(4)); this is never worse for the customer. National/regional public
 holidays are **not** modelled (documented limitation; the flag can be turned
 off in the config).
 
@@ -142,3 +142,15 @@ still live only in Netlify, never in the repository.
 
 **D23. Demo staff credentials:** `tienda@posventa.demo` / `gotic-demo-2026`.
 They are deliberately public (README and login page).
+
+**D24. The GitHub repository could not be created tonight.** There is no
+GitHub login on this machine: `gh auth status` reports no account and the SSH
+key is rejected by GitHub ("Permission denied (publickey)"). Logging in needs
+a browser, so the repository is complete locally (history, CI workflow) and
+`MORNING.md` lists the exact commands to publish it as
+`github.com/stefanopisani91/posventa` (username taken from the git
+configuration's noreply address). The README's CI badge assumes that name.
+
+**D25. Screenshots are taken by a Playwright script against the live site**
+(`e2e/screenshots.spec.ts`), with the Netlify free-plan badge hidden so it does
+not cover content.
