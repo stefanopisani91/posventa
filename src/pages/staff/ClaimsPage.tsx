@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router";
 import type { AdminClaimListResponse, ProductOption } from "../../../shared/api-types.ts";
 import { CLAIM_STATUSES, CLAIM_TYPES, DUE_FILTERS } from "../../../shared/domain.ts";
 import { Icon } from "../../components/Icon.tsx";
+import { EmptyArt } from "../../components/Logo.tsx";
 import { DueChip, Loading, StatusBadge, TypeTag } from "../../components/ui.tsx";
 import { useApi, useTitle } from "../../hooks.ts";
 import { useI18n } from "../../i18n/i18n.ts";
@@ -51,23 +52,49 @@ export function ClaimsPage() {
   const data = claims.data;
   const pages = data ? Math.max(1, Math.ceil(data.total / data.pageSize)) : 1;
   const hasFilters = FILTER_KEYS.some((k) => k !== "sort" && k !== "page" && params.get(k));
+  const active = (key: string, value: string) => params.get(key) === value;
 
   return (
     <div className="claims">
       <header className="page-header page-header--row">
-        <h1>{t("claims.title")}</h1>
+        <div>
+          <p className="eyebrow">{t("app.tagline")}</p>
+          <h1>{t("claims.title")}</h1>
+        </div>
         {data && (
-          <div className="counters" role="group">
-            <button type="button" className="counter" onClick={() => update({ status: "open", due: undefined })}>
-              <strong>{data.counts.open}</strong> {t("claims.count.open")}
+          <div className="kpis" role="group">
+            <button
+              type="button"
+              className={`kpi ${active("status", "open") ? "is-active" : ""}`}
+              onClick={() => update({ status: "open", due: undefined })}
+            >
+              <span className="kpi__icon">
+                <Icon name="inbox" size={18} />
+              </span>
+              <span className="kpi__value">{data.counts.open}</span>
+              <span className="kpi__label">{t("claims.count.open")}</span>
             </button>
-            <button type="button" className="counter counter--overdue" onClick={() => update({ due: "overdue", status: undefined })}>
-              <Icon name="alert" size={14} />
-              <strong>{data.counts.overdue}</strong> {t("claims.count.overdue")}
+            <button
+              type="button"
+              className={`kpi kpi--overdue ${active("due", "overdue") ? "is-active" : ""}`}
+              onClick={() => update({ due: "overdue", status: undefined })}
+            >
+              <span className="kpi__icon">
+                <Icon name="alert" size={18} />
+              </span>
+              <span className="kpi__value">{data.counts.overdue}</span>
+              <span className="kpi__label">{t("claims.count.overdue")}</span>
             </button>
-            <button type="button" className="counter counter--soon" onClick={() => update({ due: "due_soon", status: undefined })}>
-              <Icon name="clock" size={14} />
-              <strong>{data.counts.dueSoon}</strong> {t("claims.count.dueSoon")}
+            <button
+              type="button"
+              className={`kpi kpi--soon ${active("due", "due_soon") ? "is-active" : ""}`}
+              onClick={() => update({ due: "due_soon", status: undefined })}
+            >
+              <span className="kpi__icon">
+                <Icon name="clock" size={18} />
+              </span>
+              <span className="kpi__value">{data.counts.dueSoon}</span>
+              <span className="kpi__label">{t("claims.count.dueSoon")}</span>
             </button>
           </div>
         )}
@@ -134,7 +161,10 @@ export function ClaimsPage() {
         </label>
         <label>
           <span>{t("filters.sort")}</span>
-          <select value={params.get("sort") ?? "due"} onChange={(e) => update({ sort: e.target.value === "due" ? undefined : e.target.value })}>
+          <select
+            value={params.get("sort") ?? "due"}
+            onChange={(e) => update({ sort: e.target.value === "due" ? undefined : e.target.value })}
+          >
             <option value="due">{t("filters.sort.due")}</option>
             <option value="newest">{t("filters.sort.newest")}</option>
             <option value="updated">{t("filters.sort.updated")}</option>
@@ -163,49 +193,55 @@ export function ClaimsPage() {
             {tn("claims.total", data.total)}
           </p>
           {data.items.length === 0 ? (
-            <p className="empty">{t("claims.empty")}</p>
+            <div className="empty">
+              <EmptyArt />
+              <p className="empty__title">{t("claims.empty")}</p>
+              <p className="muted small">{t("claims.emptyHint")}</p>
+            </div>
           ) : (
-            <table className={`claims-table${claims.loading ? " is-loading" : ""}`}>
-              <thead>
-                <tr>
-                  <th scope="col">{t("claims.col.code")}</th>
-                  <th scope="col">{t("claims.col.product")}</th>
-                  <th scope="col">{t("claims.col.customer")}</th>
-                  <th scope="col">{t("claims.col.type")}</th>
-                  <th scope="col">{t("claims.col.status")}</th>
-                  <th scope="col">{t("claims.col.deadline")}</th>
-                  <th scope="col">{t("claims.col.opened")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.items.map((c) => (
-                  <tr key={c.id}>
-                    <td data-label={t("claims.col.code")}>
-                      <Link to={`/staff/claims/${c.id}`} className="code-link">
-                        {c.code}
-                      </Link>
-                      <span className="muted small block">{c.orderNumber}</span>
-                    </td>
-                    <td data-label={t("claims.col.product")}>
-                      {c.productName}
-                      <span className="muted small block">{t(`reason.${c.reason}`)}</span>
-                    </td>
-                    <td data-label={t("claims.col.customer")}>{c.customerName}</td>
-                    <td data-label={t("claims.col.type")}>
-                      <TypeTag type={c.type} />
-                    </td>
-                    <td data-label={t("claims.col.status")}>
-                      <StatusBadge status={c.status} />
-                    </td>
-                    <td data-label={t("claims.col.deadline")}>
-                      <DueChip state={c.dueState} daysToDue={c.daysToDue} />
-                      {c.dueState !== "closed" && <span className="muted small block">{date(c.dueOn, "short")}</span>}
-                    </td>
-                    <td data-label={t("claims.col.opened")}>{date(c.openedOn, "short")}</td>
+            <div className="table-wrap">
+              <table className={`claims-table${claims.loading ? " is-loading" : ""}`}>
+                <thead>
+                  <tr>
+                    <th scope="col">{t("claims.col.code")}</th>
+                    <th scope="col">{t("claims.col.product")}</th>
+                    <th scope="col">{t("claims.col.customer")}</th>
+                    <th scope="col">{t("claims.col.type")}</th>
+                    <th scope="col">{t("claims.col.status")}</th>
+                    <th scope="col">{t("claims.col.deadline")}</th>
+                    <th scope="col">{t("claims.col.opened")}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {data.items.map((c) => (
+                    <tr key={c.id} className={`row--${c.dueState}`}>
+                      <td data-label={t("claims.col.code")}>
+                        <Link to={`/staff/claims/${c.id}`} className="code-link">
+                          {c.code}
+                        </Link>
+                        <span className="muted small block">{c.orderNumber}</span>
+                      </td>
+                      <td data-label={t("claims.col.product")}>
+                        <span className="cell-strong">{c.productName}</span>
+                        <span className="muted small block">{t(`reason.${c.reason}`)}</span>
+                      </td>
+                      <td data-label={t("claims.col.customer")}>{c.customerName}</td>
+                      <td data-label={t("claims.col.type")}>
+                        <TypeTag type={c.type} />
+                      </td>
+                      <td data-label={t("claims.col.status")}>
+                        <StatusBadge status={c.status} />
+                      </td>
+                      <td data-label={t("claims.col.deadline")}>
+                        <DueChip state={c.dueState} daysToDue={c.daysToDue} />
+                        {c.dueState !== "closed" && <span className="muted small block">{date(c.dueOn, "short")}</span>}
+                      </td>
+                      <td data-label={t("claims.col.opened")}>{date(c.openedOn, "short")}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
           {pages > 1 && (
             <nav className="pagination" aria-label="Pagination">

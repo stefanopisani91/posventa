@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from "react-router";
 import type { DemoInfoResponse, TrackingResponse } from "../../../shared/api-types.ts";
 import type { ClaimStatus } from "../../../shared/domain.ts";
 import { ApiError } from "../../api.ts";
-import { Icon } from "../../components/Icon.tsx";
+import { Icon, type IconName } from "../../components/Icon.tsx";
 import { Alert, ErrorState, Field, Loading, StatusBadge, TypeTag } from "../../components/ui.tsx";
 import { useApi, useTitle } from "../../hooks.ts";
 import { useI18n } from "../../i18n/i18n.ts";
@@ -26,8 +26,11 @@ export function TrackPage() {
   const badFormat = claim.error instanceof ApiError && claim.error.code === "validation_error";
 
   return (
-    <div className="track">
+    <div className="container track">
       <header className="page-header">
+        <p className="eyebrow">
+          <Icon name="search" size={14} /> {t("nav.track")}
+        </p>
         <h1>{t("track.title")}</h1>
         <p className="lead">{t("track.lead")}</p>
       </header>
@@ -37,6 +40,7 @@ export function TrackPage() {
           <div className="input-row">
             <input
               id="code"
+              className="input--code"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="PV-XXXX-XXXX"
@@ -70,22 +74,30 @@ export function TrackPage() {
   );
 }
 
-const FLOW: ClaimStatus[] = ["received", "approved", "product_returned"];
+const FLOW: { status: ClaimStatus; icon: IconName }[] = [
+  { status: "received", icon: "message" },
+  { status: "approved", icon: "check" },
+  { status: "product_returned", icon: "package" },
+];
 
 function TrackingResult({ claim }: { claim: TrackingResponse }) {
   const { t, lang, date, dateTime } = useI18n();
   const reached = new Set(claim.events.map((e) => e.toStatus).filter(Boolean));
   const finalStatus = claim.closed ? claim.status : null;
-  const steps: { key: string; label: string; done: boolean; current: boolean; rejected?: boolean }[] = [
+  const finalIcon: IconName =
+    finalStatus === "rejected" ? "x" : finalStatus === "replaced" ? "rotate" : finalStatus === "refunded" ? "undo" : "sparkle";
+  const steps: { key: string; label: string; icon: IconName; done: boolean; current: boolean; rejected?: boolean }[] = [
     ...FLOW.map((s) => ({
-      key: s,
-      label: t(`status.${s}`),
-      done: reached.has(s),
-      current: claim.status === s,
+      key: s.status,
+      label: t(`status.${s.status}`),
+      icon: s.icon,
+      done: reached.has(s.status),
+      current: claim.status === s.status,
     })),
     {
       key: "final",
       label: finalStatus ? t(`status.${finalStatus}`) : t("track.step.resolved"),
+      icon: finalIcon,
       done: finalStatus !== null,
       current: finalStatus !== null,
       rejected: finalStatus === "rejected",
@@ -110,23 +122,18 @@ function TrackingResult({ claim }: { claim: TrackingResponse }) {
         {steps.map((s) => (
           <li
             key={s.key}
-            className={[
-              "stepper__step",
-              s.done ? "is-done" : "",
-              s.current ? "is-current" : "",
-              s.rejected ? "is-rejected" : "",
-            ].join(" ")}
+            className={["stepper__step", s.done ? "is-done" : "", s.current ? "is-current" : "", s.rejected ? "is-rejected" : ""].join(" ")}
             aria-current={s.current ? "step" : undefined}
           >
             <span className="stepper__dot" aria-hidden="true">
-              {s.done && <Icon name={s.rejected ? "x" : "check"} size={12} />}
+              <Icon name={s.icon} size={14} />
             </span>
             <span className="stepper__label">{s.label}</span>
           </li>
         ))}
       </ol>
 
-      <dl className="facts">
+      <dl className="facts facts--grid">
         <div>
           <dt>{t("track.product")}</dt>
           <dd>{claim.productName}</dd>
@@ -151,7 +158,9 @@ function TrackingResult({ claim }: { claim: TrackingResponse }) {
       <ol className="timeline">
         {[...claim.events].reverse().map((e, i) => (
           <li key={`${e.at}-${i}`} className="timeline__item">
-            <span className="timeline__dot" aria-hidden="true" />
+            <span className="timeline__dot" aria-hidden="true">
+              <Icon name={e.kind === "created" ? "message" : "check"} size={11} />
+            </span>
             <div>
               <p className="timeline__title">
                 {e.kind === "created" ? t("event.created") : t("event.status", { status: t(`status.${e.toStatus ?? "received"}`) })}

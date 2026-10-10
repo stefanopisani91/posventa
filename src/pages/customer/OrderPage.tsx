@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Link, useLocation } from "react-router";
 import type { CreateClaimResponse, OrderItemView, OrderLookupResponse } from "../../../shared/api-types.ts";
+import { daysBetween, type IsoDate } from "../../../shared/dates.ts";
 import { reasonsFor, type ClaimReason, type ClaimType } from "../../../shared/domain.ts";
 import { LEGAL_RULES } from "../../../shared/legal-rules.ts";
 import { ApiError, api } from "../../api.ts";
+import { CATEGORY_ICON } from "../../components/category-icons.ts";
 import { Icon } from "../../components/Icon.tsx";
 import { Alert, CopyButton, ErrorState, Field, Loading, StatusBadge, TypeTag } from "../../components/ui.tsx";
 import { errorMessage } from "../../errors.ts";
@@ -56,7 +58,7 @@ export function OrderPage() {
 
   if (!credentials) {
     return (
-      <div className="narrow">
+      <div className="container narrow">
         <Alert kind="info">{t("order.lookupAgain")}</Alert>
         <Link to="/" className="btn btn--primary">
           {t("order.another")}
@@ -64,21 +66,37 @@ export function OrderPage() {
       </div>
     );
   }
-  if (error && !order) return <ErrorState error={error} onRetry={() => void refresh()} />;
-  if (!order) return <Loading />;
+  if (error && !order) {
+    return (
+      <div className="container">
+        <ErrorState error={error} onRetry={() => void refresh()} />
+      </div>
+    );
+  }
+  if (!order) {
+    return (
+      <div className="container">
+        <Loading />
+      </div>
+    );
+  }
 
   return (
-    <div className="order">
+    <div className="container order">
       <Link to="/" className="back-link">
         <Icon name="arrowLeft" size={16} />
         {t("order.another")}
       </Link>
-      <header className="page-header">
-        <h1>{t("order.title", { number: order.orderNumber })}</h1>
-        <p className="lead">{t("order.hello", { name: order.customerFirstName })}</p>
+      <header className="page-header order__header">
+        <div>
+          <p className="eyebrow">{t("order.hello", { name: order.customerFirstName })}</p>
+          <h1>{t("order.title", { number: order.orderNumber })}</h1>
+        </div>
         <ul className="order__meta">
-          <li>{t("order.placed", { date: date(order.placedOn) })}</li>
           <li>
+            <Icon name="calendar" size={16} /> {t("order.placed", { date: date(order.placedOn) })}
+          </li>
+          <li className={order.deliveredOn ? "order__meta--delivered" : ""}>
             {order.deliveredOn ? (
               <>
                 <Icon name="package" size={16} /> {t("order.delivered", { date: date(order.deliveredOn) })}
@@ -96,7 +114,7 @@ export function OrderPage() {
         {order.items.map((item) => (
           <li key={item.id} className="card item">
             <ItemHeader item={item} />
-            <Rights item={item} />
+            <Rights item={item} deliveredOn={order.deliveredOn} today={order.today} />
             {item.claims.length > 0 && <ItemClaims item={item} />}
             {created?.itemId === item.id ? (
               <Created claim={created.claim} />
@@ -113,12 +131,18 @@ export function OrderPage() {
                 }}
               />
             ) : (
-              <ItemActions item={item} onStart={(type) => { setCreated(undefined); setForm({ itemId: item.id, type }); }} />
+              <ItemActions
+                item={item}
+                onStart={(type) => {
+                  setCreated(undefined);
+                  setForm({ itemId: item.id, type });
+                }}
+              />
             )}
           </li>
         ))}
       </ul>
-      <p className="muted small">
+      <p className="muted small note-line">
         <Icon name="info" size={14} /> {t("order.weekendNote")}
       </p>
     </div>
@@ -129,23 +153,32 @@ function ItemHeader({ item }: { item: OrderItemView }) {
   const { t, money } = useI18n();
   return (
     <div className="item__header">
-      <span className="item__icon" aria-hidden="true">
-        <Icon name="package" size={22} />
+      <span className={`item__icon item__icon--${item.category}`} aria-hidden="true">
+        <Icon name={CATEGORY_ICON[item.category]} size={24} />
       </span>
-      <div>
+      <div className="item__title">
         <h2 className="item__name">{item.productName}</h2>
         <p className="muted small">
-          {t(`category.${item.category}`)} · {t("order.qty", { n: item.quantity })} · {money(item.unitPriceCents)}
+          {t(`category.${item.category}`)} · {t("order.qty", { n: item.quantity })}
         </p>
       </div>
+      <p className="item__price">{money(item.unitPriceCents)}</p>
     </div>
   );
 }
 
-function Rights({ item }: { item: OrderItemView }) {
+function Rights({ item, deliveredOn, today }: { item: OrderItemView; deliveredOn: IsoDate | null; today: IsoDate }) {
   const { t, tn, date } = useI18n();
   const { withdrawal, warranty } = item.eligibility;
   const returned = item.claims.some((c) => c.type === "withdrawal" && c.status === "refunded");
+
+  // Time meters: how far into each legal window we are.
+  const wTotal = deliveredOn && withdrawal.lastDay ? daysBetween(deliveredOn, withdrawal.lastDay) : 0;
+  const wDay = deliveredOn ? Math.min(wTotal, Math.max(0, daysBetween(deliveredOn, today))) : 0;
+  const yTotal = LEGAL_RULES.warranty.years;
+  const yElapsed = deliveredOn ? daysBetween(deliveredOn, today) / 365.25 : 0;
+  const yYear = Math.min(yTotal, Math.floor(yElapsed) + 1);
+  const presumptionShare = (LEGAL_RULES.warranty.presumptionYears / yTotal) * 100;
 
   return (
     <div className="rights-panels">
@@ -159,9 +192,15 @@ function Rights({ item }: { item: OrderItemView }) {
         {withdrawal.state === "open" && withdrawal.lastDay && (
           <>
             <p className="right-panel__date">{t("rights.withdrawal.until", { date: date(withdrawal.lastDay) })}</p>
+            <div className="meter" aria-hidden="true">
+              <span className="meter__fill" style={{ width: `${(wDay / Math.max(1, wTotal)) * 100}%` }} />
+            </div>
             <p className="right-panel__left">
-              <Icon name="clock" size={14} />{" "}
-              {withdrawal.daysLeft === 0 ? t("rights.withdrawal.lastDay") : tn("rights.withdrawal.left", withdrawal.daysLeft ?? 0)}
+              <span>{t("rights.dayOf", { n: wDay, total: wTotal })}</span>
+              <span className="right-panel__badge">
+                <Icon name="clock" size={13} />
+                {withdrawal.daysLeft === 0 ? t("rights.withdrawal.lastDay") : tn("rights.withdrawal.left", withdrawal.daysLeft ?? 0)}
+              </span>
             </p>
           </>
         )}
@@ -170,7 +209,7 @@ function Rights({ item }: { item: OrderItemView }) {
         )}
       </section>
 
-      <section className={`right-panel ${warranty.available && !returned ? "right-panel--open" : "right-panel--closed"}`}>
+      <section className={`right-panel right-panel--warranty ${warranty.available && !returned ? "right-panel--open" : "right-panel--closed"}`}>
         <h3>
           <Icon name="shield" size={16} /> {t("rights.warranty")}
         </h3>
@@ -178,6 +217,18 @@ function Rights({ item }: { item: OrderItemView }) {
         {warranty.state === "open" && warranty.endsOn && warranty.presumptionEndsOn && (
           <>
             <p className="right-panel__date">{t("rights.warranty.until", { date: date(warranty.endsOn) })}</p>
+            <div className="meter meter--split" aria-hidden="true">
+              <span className="meter__segment meter__segment--presumed" style={{ width: `${presumptionShare}%` }} />
+              <span className="meter__segment meter__segment--proof" style={{ width: `${100 - presumptionShare}%` }} />
+              <span className="meter__marker" style={{ left: `${Math.min(100, (yElapsed / yTotal) * 100)}%` }} />
+            </div>
+            <p className="right-panel__left">
+              <span>{t("rights.yearOf", { n: yYear, total: yTotal })}</span>
+              <span className="meter__legend">
+                <i className="meter__dot meter__dot--presumed" /> {t("rights.meter.presumed")}
+                <i className="meter__dot meter__dot--proof" /> {t("rights.meter.proof")}
+              </span>
+            </p>
             <p className="small">
               {warranty.presumptionActive
                 ? t("rights.warranty.presumption", { date: date(warranty.presumptionEndsOn) })
@@ -282,7 +333,10 @@ function ClaimForm({
 
   return (
     <form className="claim-form" onSubmit={(e) => void submit(e)} noValidate>
-      <h3>{t(`claimForm.title.${type}`, { product: item.productName })}</h3>
+      <h3>
+        <Icon name={type === "withdrawal" ? "undo" : "shield"} size={18} />
+        {t(`claimForm.title.${type}`, { product: item.productName })}
+      </h3>
       <Field
         id={`${idPrefix}-reason`}
         label={type === "withdrawal" ? t("claimForm.reasonOptional") : t("claimForm.reason")}
@@ -335,9 +389,10 @@ function Created({ claim }: { claim: CreateClaimResponse }) {
   const { t, date } = useI18n();
   return (
     <div className="created" role="status">
-      <h3>
-        <Icon name="check" size={20} /> {t("created.title")}
-      </h3>
+      <span className="created__check" aria-hidden="true">
+        <Icon name="check" size={22} />
+      </span>
+      <h3>{t("created.title")}</h3>
       <p className="muted small">{t("created.code")}</p>
       <div className="created__code">
         <strong data-testid="claim-code">{claim.code}</strong>

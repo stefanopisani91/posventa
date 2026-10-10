@@ -4,11 +4,31 @@
  * and a table view so no number is only available as a shape.
  */
 import { useState, type ReactNode } from "react";
+import { Icon, type IconName } from "./Icon.tsx";
 
-export function StatTile({ label, value, help, tone }: { label: string; value: string; help?: ReactNode; tone?: "critical" }) {
+export function StatTile({
+  icon,
+  label,
+  value,
+  help,
+  tone,
+}: {
+  icon?: IconName;
+  label: string;
+  value: string;
+  help?: ReactNode;
+  tone?: "critical";
+}) {
   return (
     <div className={`stat-tile${tone ? ` stat-tile--${tone}` : ""}`}>
-      <p className="stat-tile__label">{label}</p>
+      <div className="stat-tile__head">
+        <p className="stat-tile__label">{label}</p>
+        {icon && (
+          <span className="stat-tile__icon" aria-hidden="true">
+            <Icon name={icon} size={16} />
+          </span>
+        )}
+      </div>
       <p className="stat-tile__value">{value}</p>
       {help && <p className="stat-tile__help">{help}</p>}
     </div>

@@ -26,7 +26,10 @@ export function StatsPage() {
   return (
     <div className="stats">
       <header className="page-header page-header--row">
-        <h1>{t("stats.title")}</h1>
+        <div>
+          <p className="eyebrow">{t("app.tagline")}</p>
+          <h1>{t("stats.title")}</h1>
+        </div>
         <div className="segmented" role="group" aria-label={t("stats.title")}>
           {PERIODS.map((p) => (
             <button
@@ -48,14 +51,16 @@ export function StatsPage() {
         <div className={stats.loading ? "is-loading" : ""}>
           <p className="muted small">{t("stats.basis", { orders: s.deliveredOrders, claims: s.claims.total })}</p>
           <div className="tiles">
-            <StatTile label={t("stats.returnRate")} value={percent(s.returnRate)} help={t("stats.returnRateHelp")} />
-            <StatTile label={t("stats.warrantyRate")} value={percent(s.warrantyClaimRate)} help={t("stats.warrantyRateHelp")} />
+            <StatTile icon="undo" label={t("stats.returnRate")} value={percent(s.returnRate)} help={t("stats.returnRateHelp")} />
+            <StatTile icon="shield" label={t("stats.warrantyRate")} value={percent(s.warrantyClaimRate)} help={t("stats.warrantyRateHelp")} />
             <StatTile
+              icon="clock"
               label={t("stats.avgClose")}
               value={days(s.avgCloseDays.all)}
               help={t("stats.avgCloseHelp", { w: days(s.avgCloseDays.withdrawal), g: days(s.avgCloseDays.warranty) })}
             />
             <StatTile
+              icon="inbox"
               label={t("stats.open")}
               value={String(s.claims.open)}
               tone={s.claims.overdue > 0 ? "critical" : undefined}

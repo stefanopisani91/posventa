@@ -7,20 +7,24 @@ import { useApi } from "../hooks.ts";
 import { useI18n } from "../i18n/i18n.ts";
 import { Icon } from "./Icon.tsx";
 import { LanguageSelect } from "./LanguageSelect.tsx";
+import { Logo } from "./Logo.tsx";
 import { ResetDemoButton } from "./ResetDemoButton.tsx";
 import { ErrorState, Loading } from "./ui.tsx";
 
 const REPO_URL: string | undefined = import.meta.env.VITE_REPO_URL;
+const CEC_URL =
+  "https://portal-cec.consumo.gob.es/sites/default/files/documentos/FOLLETO_DERECHO_DESISTIMIENTO_JULIO_2026.pdf";
 
 function Brand({ to, staff = false }: { to: string; staff?: boolean }) {
   return (
     <Link to={to} className="brand">
-      <span className="brand__mark" aria-hidden="true">
-        <Icon name="undo" size={18} />
-      </span>
+      <Logo size={36} />
       <span className="brand__text">
         <span className="brand__shop">{SHOP_POLICY.name}</span>
-        <span className="brand__product">Posventa{staff ? " · Staff" : ""}</span>
+        <span className="brand__product">
+          Posventa
+          {staff && <span className="brand__staff">Staff</span>}
+        </span>
       </span>
     </Link>
   );
@@ -30,22 +34,46 @@ function Footer() {
   const { t } = useI18n();
   return (
     <footer className="footer">
-      <div className="container footer__inner">
-        <p>{t("footer.demo")}</p>
-        <p>
-          {t("footer.legal")}{" "}
-          <a href={LEGAL_RULES.lawReference.url} target="_blank" rel="noreferrer">
-            {t("footer.source")}
-          </a>
-          {REPO_URL && (
-            <>
-              {" · "}
-              <a href={REPO_URL} target="_blank" rel="noreferrer">
-                {t("footer.code")}
+      <div className="container footer__grid">
+        <div className="footer__brand">
+          <Logo size={32} />
+          <div>
+            <p className="footer__name">{SHOP_POLICY.name} · Posventa</p>
+            <p>{t("footer.about")}</p>
+          </div>
+        </div>
+        <div>
+          <p className="footer__heading">{t("footer.sources")}</p>
+          <ul>
+            <li>
+              <a href={LEGAL_RULES.lawReference.url} target="_blank" rel="noreferrer">
+                {t("footer.law")} <Icon name="external" size={12} />
               </a>
-            </>
-          )}
-        </p>
+            </li>
+            <li>
+              <a href={CEC_URL} target="_blank" rel="noreferrer">
+                {t("footer.cec")} <Icon name="external" size={12} />
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p className="footer__heading">{t("footer.project")}</p>
+          <ul>
+            <li>{t("footer.builtWith")}</li>
+            {REPO_URL && (
+              <li>
+                <a href={REPO_URL} target="_blank" rel="noreferrer">
+                  {t("footer.code")} <Icon name="external" size={12} />
+                </a>
+              </li>
+            )}
+          </ul>
+        </div>
+      </div>
+      <div className="container footer__legal">
+        <p>{t("footer.demo")}</p>
+        <p>{t("footer.legal")}</p>
       </div>
     </footer>
   );
@@ -64,11 +92,14 @@ export function PublicLayout() {
               {t("nav.returns")}
             </NavLink>
             <NavLink to="/track">{t("nav.track")}</NavLink>
-            <NavLink to="/staff">{t("nav.staff")}</NavLink>
+            <NavLink to="/staff">
+              <Icon name="lock" size={14} />
+              {t("nav.staff")}
+            </NavLink>
           </nav>
         </div>
       </header>
-      <main id="main" className="container main">
+      <main id="main" className="main">
         <Outlet />
       </main>
       <Footer />
@@ -122,6 +153,7 @@ export function StaffLayout() {
               {t("nav.stats")}
             </NavLink>
             <a href="/" className="topnav__secondary">
+              <Icon name="store" size={16} />
               {t("nav.customerSite")}
             </a>
           </nav>
@@ -134,8 +166,10 @@ export function StaffLayout() {
           </div>
         </div>
       </header>
-      <main id="main" className="container main">
-        <Outlet />
+      <main id="main" className="main">
+        <div className="container">
+          <Outlet />
+        </div>
       </main>
       <Footer />
     </div>

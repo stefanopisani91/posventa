@@ -28,9 +28,11 @@ export function ClaimDetailPage() {
         <Icon name="arrowLeft" size={16} />
         {t("detail.back")}
       </Link>
-      <header className="page-header detail__header">
+      <header className={`page-header detail__header detail__header--${c.type}`}>
         <div>
-          <p className="muted small">{t("detail.request")}</p>
+          <p className="eyebrow">
+            <Icon name={c.type === "withdrawal" ? "undo" : "shield"} size={14} /> {t(`type.${c.type}`)}
+          </p>
           <h1 className="detail__code">{c.code}</h1>
         </div>
         <div className="detail__badges">
@@ -166,13 +168,16 @@ function LegalCheck({ claim: c }: { claim: AdminClaimDetail }) {
   }
   return (
     <section className={`card legal-check ${ok ? "" : "legal-check--warn"}`}>
-      <h2 className="small-heading">
-        <Icon name="shield" size={16} /> {t("detail.legal")}
-      </h2>
-      <p>{text}</p>
+      <span className="legal-check__icon" aria-hidden="true">
+        <Icon name={ok ? "shield" : "alert"} size={20} />
+      </span>
+      <div>
+        <h2 className="small-heading">{t("detail.legal")}</h2>
+        <p>{text}</p>
       <a className="small" href={c.type === "withdrawal" ? LEGAL_RULES.withdrawal.articleUrl : LEGAL_RULES.warranty.articleUrl} target="_blank" rel="noreferrer">
         {LEGAL_RULES.lawReference.name} <Icon name="external" size={12} />
       </a>
+      </div>
     </section>
   );
 }
@@ -185,7 +190,9 @@ function Timeline({ claim: c }: { claim: AdminClaimDetail }) {
       <ol className="timeline">
         {[...c.events].reverse().map((e) => (
           <li key={e.id} className={`timeline__item ${e.isPublic ? "" : "timeline__item--internal"}`}>
-            <span className="timeline__dot" aria-hidden="true" />
+            <span className="timeline__dot" aria-hidden="true">
+              <Icon name={e.kind === "internal_note" ? "lock" : e.kind === "created" ? "message" : "check"} size={11} />
+            </span>
             <div>
               <p className="timeline__title">
                 {e.kind === "created" && t("event.created")}

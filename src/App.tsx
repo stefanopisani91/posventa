@@ -12,7 +12,7 @@ import { StatsPage } from "./pages/staff/StatsPage.tsx";
 function NotFound() {
   const { t } = useI18n();
   return (
-    <div className="narrow">
+    <div className="container narrow">
       <h1>404</h1>
       <Link to="/" className="btn btn--primary">
         {t("nav.returns")}
