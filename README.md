@@ -12,6 +12,13 @@ every step, and sees which products cause the most problems.
 
 The interface is available in **Spanish, English and Italian** and works on a phone.
 
+> **Resumen en español.** Posventa es la herramienta de posventa de *Circuito Gòtic*, una tienda online
+> de electrónica ficticia en Barcelona. El cliente introduce su número de pedido y su email y ve qué puede
+> pedir para cada producto —devolución en los 14 días siguientes a la entrega o garantía legal de 3 años,
+> con las fechas exactas—, abre una solicitud y la sigue con un código. La tienda gestiona una cola
+> ordenada por plazo legal, registra cada paso (con notas internas) y ve en números qué productos dan
+> más problemas. Interfaz en español, inglés e italiano; datos ficticios; no es asesoramiento jurídico.
+
 ## Try it
 
 | What | How |
