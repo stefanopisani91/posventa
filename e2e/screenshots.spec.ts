@@ -61,7 +61,9 @@ test("desktop", async ({ page }) => {
   await page.locator(".stacked__col").nth(10).hover();
   await page.screenshot({ path: `${OUT}/staff-numbers.png`, fullPage: true });
 
+  await page.context().clearCookies();
   await page.goto("/staff/login");
+  await page.waitForSelector(".demo-credentials");
   await page.screenshot({ path: `${OUT}/staff-login.png` });
 });
 
