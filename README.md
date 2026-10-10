@@ -80,6 +80,18 @@ Dates are generated relative to the day the data is restored, so these situation
   requests per month, most frequent reasons, products with most problems, requests by status — for
   the last 90 days, 12 months or all time. Each chart has a table view.
 
+## Design
+
+- One token system (`src/styles.css`): brand navy → electric blue, a single warm amber accent, status colours
+  that always come with an icon and a word. Dark mode is a second palette, not an inversion.
+- Typeface: Manrope, bundled with the app (no requests to Google Fonts from EU visitors).
+- Charts are plain HTML/CSS with a legend, a hover/keyboard tooltip and a table view; the two series
+  colours were validated for colour-vision deficiency in both themes.
+- The design was reviewed by four independent reviewer agents (visual/brand, mobile, accessibility,
+  charts & dashboard) working from 36 screenshots and the running app; what was applied, what was not
+  and why is in [docs/design-review.md](docs/design-review.md). Contrast was measured on real elements
+  in both themes and the app was checked with axe-core on every page.
+
 ## Spanish legal rules
 
 All legal values live in one file, [`shared/legal-rules.ts`](shared/legal-rules.ts), used by both the
