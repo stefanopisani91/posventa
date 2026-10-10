@@ -17,7 +17,7 @@ const CEC_URL =
 function Brand({ to, staff = false }: { to: string; staff?: boolean }) {
   return (
     <Link to={to} className="brand">
-      <Logo size={36} />
+      <Logo size={36} decorative />
       <span className="brand__text">
         <span className="brand__shop">{SHOP_POLICY.name}</span>
         <span className="brand__product">
@@ -35,7 +35,7 @@ function Footer() {
     <footer className="footer">
       <div className="container footer__grid">
         <div className="footer__brand">
-          <Logo size={32} />
+          <Logo size={32} decorative />
           <div>
             <p className="footer__name">{SHOP_POLICY.name} · Posventa</p>
             <p>{t("footer.about")}</p>
@@ -84,7 +84,7 @@ export function PublicLayout() {
         <div className="container topbar__inner">
           <Brand to="/" />
           <LanguageSelect />
-          <nav className="topnav" aria-label="Main">
+          <nav className="topnav" aria-label={t("nav.landmark.main")}>
             <NavLink to="/" end>
               {t("nav.returns")}
             </NavLink>
@@ -140,7 +140,7 @@ export function StaffLayout() {
         <div className="container topbar__inner">
           <Brand to="/staff" staff />
           <LanguageSelect />
-          <nav className="topnav" aria-label="Staff">
+          <nav className="topnav" aria-label={t("nav.landmark.staff")}>
             <NavLink to="/staff" end>
               <Icon name="list" size={16} />
               {t("nav.claims")}

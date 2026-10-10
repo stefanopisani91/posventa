@@ -44,7 +44,6 @@ export function TrackPage() {
               autoCapitalize="characters"
               autoComplete="off"
               spellCheck={false}
-              aria-describedby="code-hint"
             />
             <button type="submit" className="btn btn--primary">
               <Icon name="search" size={18} />

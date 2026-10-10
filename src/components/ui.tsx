@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { cloneElement, isValidElement, useState, type ReactElement, type ReactNode } from "react";
 import type { ClaimStatus, ClaimType, DueState } from "../../shared/domain.ts";
 import { errorMessage } from "../errors.ts";
 import { useI18n } from "../i18n/i18n.ts";
@@ -87,11 +87,19 @@ export function Field({
   error?: string;
   children: ReactNode;
 }) {
+  // The control is told about its hint and error, so assistive tech reads them.
+  const describedBy = [hint ? `${id}-hint` : "", error ? `${id}-error` : ""].filter(Boolean).join(" ") || undefined;
+  const control = isValidElement(children)
+    ? cloneElement(children as ReactElement<Record<string, unknown>>, {
+        "aria-describedby": describedBy,
+        "aria-invalid": error ? true : undefined,
+      })
+    : children;
   return (
     <div className={error ? "field field--invalid" : "field"}>
       <label htmlFor={id}>{label}</label>
-      {children}
-      {hint && !error && (
+      {control}
+      {hint && (
         <p className="field__hint" id={`${id}-hint`}>
           {hint}
         </p>

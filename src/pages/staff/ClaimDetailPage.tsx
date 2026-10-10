@@ -342,7 +342,6 @@ function StatusForm({
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             required={rejecting}
-            aria-describedby="status-message-hint"
           />
         </Field>
         {error !== undefined && !messageInvalid && <Alert kind="error">{errorMessage(t, error)}</Alert>}
@@ -389,7 +388,6 @@ function NoteForm({ claim: c, onSaved }: { claim: AdminClaimDetail; onSaved: (cl
             maxLength={2000}
             value={text}
             onChange={(e) => setText(e.target.value)}
-            aria-describedby="note-hint"
           />
         </Field>
         {error !== undefined && <Alert kind="error">{errorMessage(t, error)}</Alert>}

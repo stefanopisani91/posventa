@@ -376,7 +376,6 @@ function ClaimForm({
           rows={4}
           maxLength={2000}
           required={type === "warranty"}
-          aria-describedby={`${idPrefix}-description-hint`}
         />
       </Field>
       {error !== undefined && invalid.length === 0 && <Alert kind="error">{errorMessage(t, error)}</Alert>}

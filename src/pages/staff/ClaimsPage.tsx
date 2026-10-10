@@ -61,10 +61,11 @@ export function ClaimsPage() {
       <header className="page-header page-header--row">
         <h1>{t("claims.title")}</h1>
         {data && (
-          <div className="kpis" role="group">
+          <div className="kpis" role="group" aria-label={t("claims.quickFilters")}>
             <button
               type="button"
               className={`kpi ${active("status", "open") ? "is-active" : ""}`}
+              aria-pressed={active("status", "open")}
               onClick={() => update({ status: "open", due: undefined })}
             >
               <span className="kpi__icon">
@@ -81,6 +82,7 @@ export function ClaimsPage() {
             <button
               type="button"
               className={`kpi kpi--overdue ${active("due", "overdue") ? "is-active" : ""}`}
+              aria-pressed={active("due", "overdue")}
               onClick={() => update({ due: "overdue", status: undefined })}
             >
               <span className="kpi__icon">
@@ -92,6 +94,7 @@ export function ClaimsPage() {
             <button
               type="button"
               className={`kpi kpi--soon ${active("due", "due_soon") ? "is-active" : ""}`}
+              aria-pressed={active("due", "due_soon")}
               onClick={() => update({ due: "due_soon", status: undefined })}
             >
               <span className="kpi__icon">
@@ -213,43 +216,43 @@ export function ClaimsPage() {
             </div>
           ) : (
             <div className="table-wrap">
-              <table className={`claims-table${claims.loading ? " is-loading" : ""}`}>
-                <thead>
-                  <tr>
-                    <th scope="col">{t("claims.col.code")}</th>
-                    <th scope="col">{t("claims.col.product")}</th>
-                    <th scope="col">{t("claims.col.customer")}</th>
-                    <th scope="col">{t("claims.col.type")}</th>
-                    <th scope="col">{t("claims.col.status")}</th>
-                    <th scope="col">{t("claims.col.deadline")}</th>
-                    <th scope="col">{t("claims.col.opened")}</th>
+              <table className={`claims-table${claims.loading ? " is-loading" : ""}`} role="table">
+                <thead role="rowgroup">
+                  <tr role="row">
+                    <th scope="col" role="columnheader">{t("claims.col.code")}</th>
+                    <th scope="col" role="columnheader">{t("claims.col.product")}</th>
+                    <th scope="col" role="columnheader">{t("claims.col.customer")}</th>
+                    <th scope="col" role="columnheader">{t("claims.col.type")}</th>
+                    <th scope="col" role="columnheader">{t("claims.col.status")}</th>
+                    <th scope="col" role="columnheader">{t("claims.col.deadline")}</th>
+                    <th scope="col" role="columnheader">{t("claims.col.opened")}</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody role="rowgroup">
                   {data.items.map((c) => (
-                    <tr key={c.id} className={`row--${c.dueState}`}>
-                      <td data-label={t("claims.col.code")}>
+                    <tr key={c.id} className={`row--${c.dueState}`} role="row">
+                      <td role="cell" data-label={t("claims.col.code")}>
                         <Link to={`/staff/claims/${c.id}`} className="code-link">
                           {c.code}
                         </Link>
                         <span className="muted small block">{c.orderNumber}</span>
                       </td>
-                      <td data-label={t("claims.col.product")}>
+                      <td role="cell" data-label={t("claims.col.product")}>
                         <span className="cell-strong">{c.productName}</span>
                         <span className="muted small block">{t(`reason.${c.reason}`)}</span>
                       </td>
-                      <td data-label={t("claims.col.customer")}>{c.customerName}</td>
-                      <td data-label={t("claims.col.type")}>
+                      <td role="cell" data-label={t("claims.col.customer")}>{c.customerName}</td>
+                      <td role="cell" data-label={t("claims.col.type")}>
                         <TypeTag type={c.type} />
                       </td>
-                      <td data-label={t("claims.col.status")}>
+                      <td role="cell" data-label={t("claims.col.status")}>
                         <StatusBadge status={c.status} />
                       </td>
-                      <td data-label={t("claims.col.deadline")}>
+                      <td role="cell" data-label={t("claims.col.deadline")}>
                         <DueChip state={c.dueState} daysToDue={c.daysToDue} />
                         {c.dueState !== "closed" && <span className="muted small block">{date(c.dueOn, "short")}</span>}
                       </td>
-                      <td data-label={t("claims.col.opened")}>{date(c.openedOn, "short")}</td>
+                      <td role="cell" data-label={t("claims.col.opened")}>{date(c.openedOn, "short")}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -257,7 +260,7 @@ export function ClaimsPage() {
             </div>
           )}
           {pages > 1 && (
-            <nav className="pagination" aria-label="Pagination">
+            <nav className="pagination" aria-label={t("common.pagination")}>
               <button
                 type="button"
                 className="btn btn--small btn--ghost"

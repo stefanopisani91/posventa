@@ -2,15 +2,17 @@
  * Brand mark of Circuito Gòtic: a Gothic pointed arch (the shop's quarter)
  * with a circuit trace running through it.
  */
-export function Logo({ size = 36 }: { size?: number }) {
+export function Logo({ size = 36, decorative = false }: { size?: number; decorative?: boolean }) {
   return (
     <svg
       className="logo"
       width={size}
       height={size}
       viewBox="0 0 40 40"
-      role="img"
-      aria-label="Circuito Gòtic"
+      role={decorative ? undefined : "img"}
+      aria-label={decorative ? undefined : "Circuito Gòtic"}
+      aria-hidden={decorative ? true : undefined}
+      focusable="false"
     >
       <defs>
         <linearGradient id="logo-bg" x1="0" y1="0" x2="1" y2="1">

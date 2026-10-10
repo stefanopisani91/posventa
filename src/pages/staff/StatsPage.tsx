@@ -39,7 +39,7 @@ export function StatsPage() {
     <div className="stats">
       <header className="page-header page-header--row">
         <h1>{t("stats.title")}</h1>
-        <div className="segmented" role="group" aria-label={t("stats.title")}>
+        <div className="segmented" role="group" aria-label={t("stats.periodLabel")}>
           {PERIODS.map((p) => (
             <button
               key={p}

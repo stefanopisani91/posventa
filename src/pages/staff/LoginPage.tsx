@@ -44,9 +44,9 @@ export function LoginPage() {
   return (
     <div className="container login">
       <aside className="login__panel">
-        <Logo size={44} />
+        <Logo size={44} decorative />
         <p className="login__panel-shop">{SHOP_POLICY.name} · Posventa</p>
-        <h2>{t("login.panel.title")}</h2>
+        <p className="login__panel-title">{t("login.panel.title")}</p>
         <ul className="login__features">
           <li>
             <Icon name="list" size={18} /> {t("login.panel.1")}

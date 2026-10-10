@@ -72,12 +72,7 @@ export function BarList({ rows, ariaLabel, legend }: { rows: BarRow[]; ariaLabel
       {legend && <Legend series={legend} />}
       <ul className="bar-list" aria-label={ariaLabel}>
         {rows.map((r) => (
-          <li
-            key={r.key}
-            className="bar-row"
-            tabIndex={0}
-            aria-label={`${r.label}: ${r.display ?? r.value}${r.sub ? ` (${r.sub})` : ""}`}
-          >
+          <li key={r.key} className="bar-row">
             <div className="bar-row__text">
               <span className="bar-row__label">{r.label}</span>
               {r.sub && <span className="bar-row__sub">{r.sub}</span>}
@@ -160,7 +155,7 @@ export function StackedColumns({
                 <div
                   key={c.key}
                   className={className}
-                  tabIndex={0}
+                  tabIndex={i === (active ?? 0) ? 0 : -1}
                   role="img"
                   aria-label={`${capitalize(c.fullLabel)}${c.partial && labels.partial ? ` (${labels.partial})` : ""}: ${series
                     .map((s, j) => `${s.name} ${c.values[j] ?? 0}`)
@@ -168,6 +163,16 @@ export function StackedColumns({
                   onMouseEnter={() => setActive(i)}
                   onFocus={() => setActive(i)}
                   onBlur={() => setActive(null)}
+                  onKeyDown={(e) => {
+                    // One tab stop for the plot; arrows move between months; Escape closes the tooltip.
+                    const next = e.key === "ArrowRight" ? i + 1 : e.key === "ArrowLeft" ? i - 1 : null;
+                    if (next !== null && columns[next]) {
+                      e.preventDefault();
+                      (e.currentTarget.parentElement?.children[next] as HTMLElement | undefined)?.focus();
+                    } else if (e.key === "Escape") {
+                      setActive(null);
+                    }
+                  }}
                 >
                   {i === peak && (totals[i] ?? 0) > 0 && (
                     <span className="stacked__peak" style={{ bottom: `calc(${heightPct}% + 4px)` }} aria-hidden="true">

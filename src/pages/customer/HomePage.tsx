@@ -106,7 +106,6 @@ export function HomePage() {
                   autoCapitalize="characters"
                   spellCheck={false}
                   required
-                  aria-describedby="orderNumber-hint"
                 />
               </Field>
               <Field
