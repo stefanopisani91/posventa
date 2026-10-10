@@ -143,13 +143,15 @@ still live only in Netlify, never in the repository.
 **D23. Demo staff credentials:** `tienda@posventa.demo` / `gotic-demo-2026`.
 They are deliberately public (README and login page).
 
-**D24. The GitHub repository could not be created tonight.** There is no
-GitHub login on this machine: `gh auth status` reports no account and the SSH
-key is rejected by GitHub ("Permission denied (publickey)"). Logging in needs
-a browser, so the repository is complete locally (history, CI workflow) and
-`MORNING.md` lists the exact commands to publish it as
-`github.com/stefanopisani91/posventa` (username taken from the git
-configuration's noreply address). The README's CI badge assumes that name.
+**D24. The GitHub repository was created on 11 October, with the owner's
+help.** There was no GitHub login on this machine (no `gh` account, SSH key
+rejected), so the first night ended with the repository complete only
+locally. The next day the owner completed two GitHub device-flow logins
+(one for the account, one to add the `workflow` scope that pushing a GitHub
+Actions file requires) and the agent created the public repository
+`github.com/stefanopisani91/posventa` with `gh repo create` and pushed.
+`package-lock.json` had to be regenerated with npm 10 (the version bundled
+with Node 22 used by CI): a lock written by npm 11 made `npm ci` fail on CI.
 
 **D25. Screenshots are taken by a Playwright script against the live site**
 (`e2e/screenshots.spec.ts`), with the Netlify free-plan badge hidden so it does
