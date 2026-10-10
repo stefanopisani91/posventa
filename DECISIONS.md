@@ -55,3 +55,85 @@ the legal file.
 withdraw "sin indicar el motivo"; the form therefore offers "Prefer not to
 say" as the default reason for a withdrawal. For warranty claims a reason and
 a description are required, because the shop needs them to assess the defect.
+
+## Product
+
+**D9. Shop name "Circuito Gòtic", brands invented.** Product brands (Ondaluz,
+Pixelmar, Teclaro, Voltiva, Sonoria, Lecturo, Trekko, Nexalia) were
+web-searched before use; "Velitra", "Kubrix" and "Lumbre" were dropped because
+they already exist as product or company names. Customer e-mails use the
+reserved `example.com` domain.
+
+**D10. Demo data is generated, not stored as a fixed dump.** A deterministic
+generator builds 15 products, 90 customers, 120 orders and 40 claims with
+dates relative to the day of the reset, so the "delivered 3 days ago" order
+is always inside its 14-day window. The 40 claims are hand-designed
+(status, product, timing) so that every status, overdue and due-soon
+deadlines, both claim types and one clearly problematic product appear.
+Consequence: with 40 claims on 120 orders the rates are far higher than a real
+shop's; the README says so.
+
+**D11. Demo data refreshes itself after 7 days.** In demo mode, if the data is
+older than 7 days it is regenerated on the next request, so a reviewer who
+opens the link weeks later still sees meaningful deadlines. Manual resets are
+limited to one every 15 seconds.
+
+**D12. The reset button is on the login page and in the staff header.** The
+brief asked for it on the login page; it is public (no login) because the
+credentials are public anyway. It only exists when `DEMO_MODE=true`.
+
+**D13. Tracking needs only the code.** Codes are `PV-XXXX-XXXX` from a
+32-character alphabet (~10^12 combinations, generated with `crypto.randomInt`).
+The tracking page shows no personal data except a masked e-mail and never shows
+internal notes.
+
+**D14. Status workflow is enforced on the server.** received → approved →
+product returned → replaced / refunded; rejection is possible until the claim
+is closed and requires a message for the customer. A withdrawal can never end
+in "replaced". Status changes carry the status the staff member saw, so two
+people editing at once get a clear conflict instead of a silent overwrite.
+
+**D15. Rates are cohort-based.** "Return rate" = share of orders delivered in
+the period that had a withdrawal; same for warranty claims and per-product
+rates. Volumes, reasons and status counts use claims opened in the period.
+
+## Technology and platform
+
+**D16. Raw SQL via `@netlify/database`'s pool, no ORM.** The schema is small;
+plain parameterised SQL keeps the queries readable and the dependency list
+short. Migration files live in `netlify/database/migrations/`.
+
+**D17. Staff auth = one shared account from environment variables + signed
+cookie.** `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `SESSION_SECRET` live only in
+Netlify. The session is an HMAC-SHA256-signed, HttpOnly, SameSite=Lax cookie
+(8 h). Mutating endpoints accept only same-origin JSON (CSRF protection).
+A real shop would use per-person accounts (e.g. Netlify Identity); noted as
+future work.
+
+**D18. Two rate-limit rules (the free-plan maximum):** login (10/min/IP) and
+the public order lookup + claim creation (30/min/IP).
+
+**D19. Local development uses `@netlify/vite-plugin`, with Edge Functions
+emulation disabled.** The Edge Functions emulator crashed on this machine
+(Deno CLI version mismatch: "unexpected argument '--allow-scripts'") and the
+project has no edge functions. `npm run dev` loads `.env` through Node's
+`--env-file-if-exists` because the plugin does not read `.env` files.
+
+**D20. Deployed through the Netlify connector's upload deploy**, not Git
+continuous deployment, because no GitHub access was available (see
+MORNING.md). The upload builds on Netlify, so the database is provisioned and
+migrations are applied exactly as with Git deploys. Local-only files (`.env`,
+`.netlify/`, `dist/`) were moved out of the folder during uploads.
+
+**D21. New Netlify projects are private by default on this team** (team-login
+required). Visitor access control was switched off for this project only;
+the access settings of the other five projects were checked before and after
+and are unchanged.
+
+**D22. Environment variables use default scopes and are not marked
+"secret".** Setting custom scopes or the secret flag through the API was
+silently ignored on the free plan (the variables were not saved). The values
+still live only in Netlify, never in the repository.
+
+**D23. Demo staff credentials:** `tienda@posventa.demo` / `gotic-demo-2026`.
+They are deliberately public (README and login page).
