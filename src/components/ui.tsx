@@ -2,16 +2,9 @@ import { useState, type ReactNode } from "react";
 import type { ClaimStatus, ClaimType, DueState } from "../../shared/domain.ts";
 import { errorMessage } from "../errors.ts";
 import { useI18n } from "../i18n/i18n.ts";
+import { STATUS_ICON } from "./category-icons.ts";
 import { Icon, type IconName } from "./Icon.tsx";
 
-const STATUS_ICON: Record<ClaimStatus, IconName> = {
-  received: "message",
-  approved: "check",
-  product_returned: "package",
-  replaced: "rotate",
-  refunded: "undo",
-  rejected: "x",
-};
 
 export function StatusBadge({ status }: { status: ClaimStatus }) {
   const { t } = useI18n();

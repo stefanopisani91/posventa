@@ -8,7 +8,6 @@ import { useI18n } from "../i18n/i18n.ts";
 import { Icon } from "./Icon.tsx";
 import { LanguageSelect } from "./LanguageSelect.tsx";
 import { Logo } from "./Logo.tsx";
-import { ResetDemoButton } from "./ResetDemoButton.tsx";
 import { ErrorState, Loading } from "./ui.tsx";
 
 const REPO_URL: string | undefined = import.meta.env.VITE_REPO_URL;
@@ -57,23 +56,21 @@ function Footer() {
             </li>
           </ul>
         </div>
-        <div>
-          <p className="footer__heading">{t("footer.project")}</p>
-          <ul>
-            <li>{t("footer.builtWith")}</li>
-            {REPO_URL && (
-              <li>
-                <a href={REPO_URL} target="_blank" rel="noreferrer">
-                  {t("footer.code")} <Icon name="external" size={12} />
-                </a>
-              </li>
-            )}
-          </ul>
-        </div>
       </div>
       <div className="container footer__legal">
         <p>{t("footer.demo")}</p>
         <p>{t("footer.legal")}</p>
+        <p>
+          {t("footer.builtWith")}
+          {REPO_URL && (
+            <>
+              {" "}
+              <a href={REPO_URL} target="_blank" rel="noreferrer">
+                {t("footer.code")} <Icon name="external" size={12} />
+              </a>
+            </>
+          )}
+        </p>
       </div>
     </footer>
   );
@@ -158,10 +155,9 @@ export function StaffLayout() {
             </a>
           </nav>
           <div className="topbar__actions">
-            <ResetDemoButton variant="compact" onDone={() => window.location.assign("/staff")} />
-            <button type="button" className="btn btn--small btn--ghost" onClick={() => void logout()}>
+            <button type="button" className="btn btn--small btn--ghost" onClick={() => void logout()} aria-label={t("nav.logout")}>
               <Icon name="logout" size={16} />
-              {t("nav.logout")}
+              <span className="btn__label">{t("nav.logout")}</span>
             </button>
           </div>
         </div>

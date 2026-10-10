@@ -4,6 +4,7 @@ import type { CreateClaimResponse, OrderItemView, OrderLookupResponse } from "..
 import { daysBetween, type IsoDate } from "../../../shared/dates.ts";
 import { reasonsFor, type ClaimReason, type ClaimType } from "../../../shared/domain.ts";
 import { LEGAL_RULES } from "../../../shared/legal-rules.ts";
+import { SHOP_POLICY } from "../../../shared/shop-policy.ts";
 import { ApiError, api } from "../../api.ts";
 import { CATEGORY_ICON } from "../../components/category-icons.ts";
 import { Icon } from "../../components/Icon.tsx";
@@ -89,8 +90,8 @@ export function OrderPage() {
       </Link>
       <header className="page-header order__header">
         <div>
-          <p className="eyebrow">{t("order.hello", { name: order.customerFirstName })}</p>
           <h1>{t("order.title", { number: order.orderNumber })}</h1>
+          <p className="lead">{t("order.hello", { name: order.customerFirstName })}</p>
         </div>
         <ul className="order__meta">
           <li>
@@ -179,6 +180,10 @@ function Rights({ item, deliveredOn, today }: { item: OrderItemView; deliveredOn
   const yElapsed = deliveredOn ? daysBetween(deliveredOn, today) / 365.25 : 0;
   const yYear = Math.min(yTotal, Math.floor(yElapsed) + 1);
   const presumptionShare = (LEGAL_RULES.warranty.presumptionYears / yTotal) * 100;
+  const todayPct = Math.min(100, (yElapsed / yTotal) * 100);
+  // Severity of the withdrawal meter: calm, due soon, last day.
+  const wSeverity =
+    withdrawal.daysLeft === 0 ? "meter--last" : (withdrawal.daysLeft ?? 99) <= SHOP_POLICY.dueSoonDays ? "meter--soon" : "";
 
   return (
     <div className="rights-panels">
@@ -192,7 +197,7 @@ function Rights({ item, deliveredOn, today }: { item: OrderItemView; deliveredOn
         {withdrawal.state === "open" && withdrawal.lastDay && (
           <>
             <p className="right-panel__date">{t("rights.withdrawal.until", { date: date(withdrawal.lastDay) })}</p>
-            <div className="meter" aria-hidden="true">
+            <div className={`meter ${wSeverity}`} aria-hidden="true">
               <span className="meter__fill" style={{ width: `${(wDay / Math.max(1, wTotal)) * 100}%` }} />
             </div>
             <p className="right-panel__left">
@@ -220,7 +225,9 @@ function Rights({ item, deliveredOn, today }: { item: OrderItemView; deliveredOn
             <div className="meter meter--split" aria-hidden="true">
               <span className="meter__segment meter__segment--presumed" style={{ width: `${presumptionShare}%` }} />
               <span className="meter__segment meter__segment--proof" style={{ width: `${100 - presumptionShare}%` }} />
-              <span className="meter__marker" style={{ left: `${Math.min(100, (yElapsed / yTotal) * 100)}%` }} />
+              <span className="meter__marker" style={{ left: `clamp(6px, ${todayPct}%, calc(100% - 6px))` }}>
+                <span className="meter__marker-label">{t("rights.today")}</span>
+              </span>
             </div>
             <p className="right-panel__left">
               <span>{t("rights.yearOf", { n: yYear, total: yTotal })}</span>

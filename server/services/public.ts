@@ -168,7 +168,7 @@ export async function createClaim(input: CreateClaim): Promise<CreateClaimRespon
 
 export function maskEmail(email: string): string {
   const [local = "", domain = ""] = email.split("@");
-  return `${local.slice(0, 2)}${"•".repeat(Math.max(3, local.length - 2))}@${domain}`;
+  return `${local.slice(0, 2)}•••@${domain}`;
 }
 
 export async function trackClaim(code: string): Promise<TrackingResponse> {

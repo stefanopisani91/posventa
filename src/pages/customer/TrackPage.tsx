@@ -28,9 +28,6 @@ export function TrackPage() {
   return (
     <div className="container track">
       <header className="page-header">
-        <p className="eyebrow">
-          <Icon name="search" size={14} /> {t("nav.track")}
-        </p>
         <h1>{t("track.title")}</h1>
         <p className="lead">{t("track.lead")}</p>
       </header>

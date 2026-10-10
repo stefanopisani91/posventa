@@ -14,8 +14,8 @@ export function Logo({ size = 36 }: { size?: number }) {
     >
       <defs>
         <linearGradient id="logo-bg" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="var(--brand-700)" />
-          <stop offset="1" stopColor="var(--brand-500)" />
+          <stop offset="0" stopColor="#1a4d9c" />
+          <stop offset="1" stopColor="#2a78d6" />
         </linearGradient>
       </defs>
       <rect width="40" height="40" rx="11" fill="url(#logo-bg)" />
@@ -46,8 +46,8 @@ export function HeroArt() {
           <stop offset="1" stopColor="#ffffff" stopOpacity="0.06" />
         </linearGradient>
         <linearGradient id="hero-shield" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#fbbf24" stopOpacity="0.95" />
-          <stop offset="1" stopColor="#f59e0b" stopOpacity="0.85" />
+          <stop offset="0" stopColor="#f5b73c" />
+          <stop offset="1" stopColor="#e3a12b" />
         </linearGradient>
       </defs>
 
@@ -84,17 +84,9 @@ export function HeroArt() {
       {/* shield */}
       <g transform="translate(290 150)">
         <path d="M40 0 76 14v30c0 24-16 40-36 48C20 84 4 68 4 44V14z" fill="url(#hero-shield)" />
-        <path d="M26 46l10 10 20-22" fill="none" stroke="#1e3a8a" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M26 46l10 10 20-22" fill="none" stroke="#0f2a5c" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
       </g>
 
-      {/* calendar chip */}
-      <g transform="translate(286 36)">
-        <rect width="92" height="64" rx="12" fill="#ffffff" fillOpacity="0.14" stroke="#ffffff" strokeOpacity="0.5" strokeWidth="2" />
-        <rect x="0" y="0" width="92" height="18" rx="12" fill="#ffffff" fillOpacity="0.18" />
-        <text x="46" y="48" textAnchor="middle" fontSize="26" fontWeight="800" fill="#ffffff" fontFamily="inherit">
-          14
-        </text>
-      </g>
     </svg>
   );
 }

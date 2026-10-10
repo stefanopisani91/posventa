@@ -24,6 +24,8 @@ export function ClaimsPage() {
   const claims = useApi<AdminClaimListResponse>(`/api/admin/claims${queryString ? `?${queryString}` : ""}`);
   const products = useApi<ProductOption[]>("/api/admin/products");
   const [search, setSearch] = useState(params.get("q") ?? "");
+  // Secondary filters start open only when one of them is in use (they collapse on small screens).
+  const [moreOpen, setMoreOpen] = useState(() => ["type", "productId", "due", "sort"].some((k) => params.get(k)));
 
   function update(changes: Record<string, string | undefined>) {
     const next = new URLSearchParams(params);
@@ -57,10 +59,7 @@ export function ClaimsPage() {
   return (
     <div className="claims">
       <header className="page-header page-header--row">
-        <div>
-          <p className="eyebrow">{t("app.tagline")}</p>
-          <h1>{t("claims.title")}</h1>
-        </div>
+        <h1>{t("claims.title")}</h1>
         {data && (
           <div className="kpis" role="group">
             <button
@@ -73,6 +72,11 @@ export function ClaimsPage() {
               </span>
               <span className="kpi__value">{data.counts.open}</span>
               <span className="kpi__label">{t("claims.count.open")}</span>
+              <span className="kpi__meter" aria-hidden="true">
+                <i className="kpi__seg kpi__seg--overdue" style={{ flexGrow: data.counts.overdue }} />
+                <i className="kpi__seg kpi__seg--soon" style={{ flexGrow: data.counts.dueSoon }} />
+                <i className="kpi__seg kpi__seg--ok" style={{ flexGrow: Math.max(0, data.counts.open - data.counts.overdue - data.counts.dueSoon) }} />
+              </span>
             </button>
             <button
               type="button"
@@ -100,7 +104,7 @@ export function ClaimsPage() {
         )}
       </header>
 
-      <form className="filters card" onSubmit={(e) => e.preventDefault()} role="search">
+      <form className={`filters card${moreOpen ? " is-open" : ""}`} onSubmit={(e) => e.preventDefault()} role="search">
         <label className="filters__search">
           <span>{t("filters.search")}</span>
           <span className="input-icon">
@@ -126,7 +130,7 @@ export function ClaimsPage() {
             ))}
           </select>
         </label>
-        <label>
+        <label className="filters__extra">
           <span>{t("filters.type")}</span>
           <select value={params.get("type") ?? ""} onChange={(e) => update({ type: e.target.value })}>
             <option value="">{t("filters.type.all")}</option>
@@ -137,7 +141,7 @@ export function ClaimsPage() {
             ))}
           </select>
         </label>
-        <label>
+        <label className="filters__extra">
           <span>{t("filters.product")}</span>
           <select value={params.get("productId") ?? ""} onChange={(e) => update({ productId: e.target.value })}>
             <option value="">{t("filters.product.all")}</option>
@@ -148,7 +152,7 @@ export function ClaimsPage() {
             ))}
           </select>
         </label>
-        <label>
+        <label className="filters__extra">
           <span>{t("filters.due")}</span>
           <select value={params.get("due") ?? ""} onChange={(e) => update({ due: e.target.value })}>
             <option value="">{t("filters.due.all")}</option>
@@ -159,7 +163,7 @@ export function ClaimsPage() {
             ))}
           </select>
         </label>
-        <label>
+        <label className="filters__extra">
           <span>{t("filters.sort")}</span>
           <select
             value={params.get("sort") ?? "due"}
@@ -170,6 +174,15 @@ export function ClaimsPage() {
             <option value="updated">{t("filters.sort.updated")}</option>
           </select>
         </label>
+        <button
+          type="button"
+          className="btn btn--small btn--ghost filters__toggle"
+          aria-expanded={moreOpen}
+          onClick={() => setMoreOpen((v) => !v)}
+        >
+          <Icon name="list" size={14} />
+          {moreOpen ? t("filters.less") : t("filters.more")}
+        </button>
         {hasFilters && (
           <button
             type="button"

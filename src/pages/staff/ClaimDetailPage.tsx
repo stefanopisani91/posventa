@@ -2,11 +2,14 @@ import { useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router";
 import type { AdminClaimDetail } from "../../../shared/api-types.ts";
 import type { ClaimStatus } from "../../../shared/domain.ts";
+import { daysBetween } from "../../../shared/dates.ts";
+import { isClosed } from "../../../shared/domain.ts";
 import { LEGAL_RULES } from "../../../shared/legal-rules.ts";
 import { SHOP_POLICY } from "../../../shared/shop-policy.ts";
 import { ApiError, api } from "../../api.ts";
 import { Icon } from "../../components/Icon.tsx";
-import { Alert, DueChip, Field, Loading, StatusBadge, TypeTag } from "../../components/ui.tsx";
+import { STATUS_ICON } from "../../components/category-icons.ts";
+import { Alert, DueChip, Field, Loading, StatusBadge } from "../../components/ui.tsx";
 import { errorMessage } from "../../errors.ts";
 import { useApi, useTitle } from "../../hooks.ts";
 import { useI18n } from "../../i18n/i18n.ts";
@@ -36,9 +39,9 @@ export function ClaimDetailPage() {
           <h1 className="detail__code">{c.code}</h1>
         </div>
         <div className="detail__badges">
-          <TypeTag type={c.type} short={false} />
           <StatusBadge status={c.status} />
           <DueChip state={c.dueState} daysToDue={c.daysToDue} />
+          <DeadlineMeter claim={c} />
         </div>
       </header>
 
@@ -46,14 +49,32 @@ export function ClaimDetailPage() {
         <div className="detail__main">
           <ClaimFacts claim={c} />
           <LegalCheck claim={c} />
-          <Timeline claim={c} />
         </div>
         <aside className="detail__side">
           <StatusForm claim={c} onSaved={claim.setData} onConflict={claim.reload} />
           <NoteForm claim={c} onSaved={claim.setData} />
         </aside>
+        <section className="detail__timeline">
+          <Timeline claim={c} />
+        </section>
       </div>
     </div>
+  );
+}
+
+/** How much of the legal/internal window is used up, for open claims. */
+function DeadlineMeter({ claim: c }: { claim: AdminClaimDetail }) {
+  const { t } = useI18n();
+  if (isClosed(c.status)) return null;
+  const total = Math.max(1, daysBetween(c.openedOn, c.dueOn));
+  const spent = Math.min(total, Math.max(0, daysBetween(c.openedOn, c.today)));
+  return (
+    <span className="deadline-meter">
+      <span className={`meter meter--${c.dueState}`} aria-hidden="true">
+        <span className="meter__fill" style={{ width: `${(spent / total) * 100}%` }} />
+      </span>
+      <span className="small muted">{t("rights.dayOf", { n: spent, total })}</span>
+    </span>
   );
 }
 
@@ -87,6 +108,21 @@ function ClaimFacts({ claim: c }: { claim: AdminClaimDetail }) {
           </dl>
           <h3 className="small-heading">{t("detail.description")}</h3>
           <blockquote className="quote">{c.description || <span className="muted">{t("detail.noDescription")}</span>}</blockquote>
+          <h2 className="small-heading">{t("detail.customer")}</h2>
+          <dl className="facts">
+            <div>
+              <dt>{t("claims.col.customer")}</dt>
+              <dd>{c.customer.name}</dd>
+            </div>
+            <div>
+              <dt>{t("login.email")}</dt>
+              <dd>{c.customer.email}</dd>
+            </div>
+            <div>
+              <dt>{t("detail.city")}</dt>
+              <dd>{c.customer.city}</dd>
+            </div>
+          </dl>
         </div>
         <div>
           <h2 className="small-heading">{t("detail.productOrder")}</h2>
@@ -122,21 +158,6 @@ function ClaimFacts({ claim: c }: { claim: AdminClaimDetail }) {
             <div>
               <dt>{t("detail.delivered")}</dt>
               <dd>{c.order.deliveredOn ? date(c.order.deliveredOn) : t("detail.notDelivered")}</dd>
-            </div>
-          </dl>
-          <h2 className="small-heading">{t("detail.customer")}</h2>
-          <dl className="facts">
-            <div>
-              <dt>{t("claims.col.customer")}</dt>
-              <dd>{c.customer.name}</dd>
-            </div>
-            <div>
-              <dt>{t("login.email")}</dt>
-              <dd>{c.customer.email}</dd>
-            </div>
-            <div>
-              <dt>{t("detail.city")}</dt>
-              <dd>{c.customer.city}</dd>
             </div>
           </dl>
         </div>
@@ -183,15 +204,38 @@ function LegalCheck({ claim: c }: { claim: AdminClaimDetail }) {
 }
 
 function Timeline({ claim: c }: { claim: AdminClaimDetail }) {
-  const { t, dateTime } = useI18n();
+  const { t, tn, date, dateTime } = useI18n();
+  const open = !isClosed(c.status);
   return (
     <section className="card">
       <h2 className="small-heading">{t("detail.timeline")}</h2>
       <ol className="timeline">
+        {open && (
+          <li className={`timeline__item timeline__item--due timeline__item--${c.dueState}`}>
+            <span className="timeline__dot" aria-hidden="true">
+              <Icon name={c.dueState === "on_track" ? "calendar" : "alert"} size={11} />
+            </span>
+            <div>
+              <p className="timeline__title">
+                {t("detail.dueNode")} · {date(c.dueOn)}
+              </p>
+              <p className="muted small">
+                {c.type === "withdrawal"
+                  ? t("detail.dueWithdrawal")
+                  : t("detail.dueWarranty", { days: SHOP_POLICY.warrantyResolutionTargetDays })}
+                {" · "}
+                {c.daysToDue < 0 ? tn("due.overdue", -c.daysToDue) : c.daysToDue === 0 ? t("due.today") : tn("due.left", c.daysToDue)}
+              </p>
+            </div>
+          </li>
+        )}
         {[...c.events].reverse().map((e) => (
           <li key={e.id} className={`timeline__item ${e.isPublic ? "" : "timeline__item--internal"}`}>
             <span className="timeline__dot" aria-hidden="true">
-              <Icon name={e.kind === "internal_note" ? "lock" : e.kind === "created" ? "message" : "check"} size={11} />
+              <Icon
+                name={e.kind === "internal_note" ? "lock" : e.kind === "created" ? "message" : STATUS_ICON[e.toStatus ?? "received"]}
+                size={11}
+              />
             </span>
             <div>
               <p className="timeline__title">

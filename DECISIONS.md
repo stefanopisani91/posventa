@@ -154,3 +154,29 @@ configuration's noreply address). The README's CI badge assumes that name.
 **D25. Screenshots are taken by a Playwright script against the live site**
 (`e2e/screenshots.spec.ts`), with the Netlify free-plan badge hidden so it does
 not cover content.
+
+## Visual design pass (11 Oct 2026)
+
+**D26. Richer but professional look, built on tokens.** The owner asked for a
+richer design. Choices: a brand mark (Gothic pointed arch with a circuit
+trace, for "Circuito Gòtic"), a navy→electric-blue gradient used only for
+the hero and the login side panel, a warm amber secondary used sparingly
+(warranty icon, due-soon state, illustration shield), category icons for
+products, time meters for the legal windows (withdrawal progress; warranty
+split into the 2-year presumption and the third year, with a "today"
+marker), KPI cards in the staff queue, an illustrated empty state and a
+structured footer. Everything is CSS custom properties, so dark mode is a
+token swap, not a second stylesheet.
+
+**D27. Font self-hosted, not loaded from Google.** Manrope Variable is
+bundled from `@fontsource-variable/manrope`. Loading fonts from Google's CDN
+sends every visitor's IP to Google, which EU regulators and at least one
+German court have treated as a GDPR problem; a Spanish shop should not depend
+on it. Only the Latin subset is downloaded by the browser (unicode-range).
+
+**D28. Design reviewed by a team of four agents with different lenses**
+(visual/brand, mobile, accessibility and contrast, charts and staff
+dashboard), each working from the same 36 screenshots (light/dark × desktop/
+mobile) plus the running app, each writing a findings file with concrete
+fixes. Findings were triaged and applied by the main agent; what was
+rejected and why is listed in `docs/design-review.md`.
