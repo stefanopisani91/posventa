@@ -3,6 +3,17 @@ import { test, type Page } from "@playwright/test";
 /** Captures the README screenshots: npm run e2e -- --project=screenshots */
 const OUT = "docs/screenshots";
 
+// Hide the Netlify free-plan badge (an iframe) so it does not cover content in the images.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    document.addEventListener("DOMContentLoaded", () => {
+      const style = document.createElement("style");
+      style.textContent = "iframe { display: none !important; }";
+      document.head.append(style);
+    });
+  });
+});
+
 async function lang(page: Page, value: string) {
   await page.locator(".lang-select select").selectOption(value);
 }

@@ -36,7 +36,7 @@ export function ResetDemoButton({ onDone, variant = "full" }: { onDone?: () => v
         title={variant === "compact" ? t("reset.help") : undefined}
       >
         <Icon name="rotate" size={16} />
-        {t("reset.button")}
+        {variant === "compact" ? t("reset.short") : t("reset.button")}
       </button>
       {variant === "full" && <p className="muted small">{t("reset.help")}</p>}
       {result && variant === "full" && <Alert kind={result.ok ? "success" : "error"}>{result.text}</Alert>}
