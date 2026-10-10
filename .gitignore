@@ -1,0 +1,27 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+*.tsbuildinfo
+
+# Netlify local state (linked site, local database files)
+.netlify/
+.env
+.env.*
+!.env.example
+
+# test / e2e artefacts
+coverage/
+test-results/
+playwright-report/
+blob-report/
+
+# OS / editor
+.DS_Store
+*.log
+.vscode/*
+!.vscode/extensions.json
+
+# personal hand-over note (see DECISIONS.md D2)
+MORNING.md
