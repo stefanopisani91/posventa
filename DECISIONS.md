@@ -111,7 +111,12 @@ A real shop would use per-person accounts (e.g. Netlify Identity); noted as
 future work.
 
 **D18. Two rate-limit rules (the free-plan maximum):** login (10/min/IP) and
-the public order lookup + claim creation (30/min/IP).
+the public order lookup + claim creation (30/min/IP). Login has its own
+function (`/api/admin/login`): in the first deploy the limit sat on the whole
+session endpoint, and the session check that every staff page makes hit the
+limit during normal use (found by the end-to-end run on the live site).
+Logout clears the cookie; because sessions are stateless, a copied token stays
+valid until it expires (8 h) — acceptable for a demo, noted as a limitation.
 
 **D19. Local development uses `@netlify/vite-plugin`, with Edge Functions
 emulation disabled.** The Edge Functions emulator crashed on this machine

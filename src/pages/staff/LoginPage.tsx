@@ -29,7 +29,7 @@ export function LoginPage() {
     setBusy(true);
     setError(undefined);
     try {
-      await api.post("/api/admin/session", { email, password });
+      await api.post("/api/admin/login", { email, password });
       navigate(from.startsWith("/staff") && from !== "/staff/login" ? from : "/staff", { replace: true });
     } catch (err) {
       setError(err);

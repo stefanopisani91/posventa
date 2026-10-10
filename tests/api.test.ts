@@ -1,6 +1,7 @@
 import type { NetlifyDB } from "@netlify/database-dev";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import adminClaims from "../netlify/functions/admin-claims.mts";
+import adminLogin from "../netlify/functions/admin-login.mts";
 import adminSession from "../netlify/functions/admin-session.mts";
 import adminStats from "../netlify/functions/admin-stats.mts";
 import claimTracking from "../netlify/functions/claim-tracking.mts";
@@ -214,7 +215,7 @@ describe("shop: authentication", () => {
   });
 
   it("rejects a wrong password", async () => {
-    const res = await call<ApiErrorBody>(adminSession, "POST", "/api/admin/session", {
+    const res = await call<ApiErrorBody>(adminLogin, "POST", "/api/admin/login", {
       body: { email: TEST_ADMIN.email, password: "wrong" },
     });
     expect(res.status).toBe(401);
@@ -222,7 +223,7 @@ describe("shop: authentication", () => {
   });
 
   it("logs in with an HttpOnly session cookie", async () => {
-    const res = await call(adminSession, "POST", "/api/admin/session", { body: TEST_ADMIN });
+    const res = await call(adminLogin, "POST", "/api/admin/login", { body: TEST_ADMIN });
     expect(res.status).toBe(200);
     const setCookie = res.headers.get("set-cookie") ?? "";
     expect(setCookie).toContain("HttpOnly");
@@ -230,6 +231,11 @@ describe("shop: authentication", () => {
     staffCookie = cookieFrom(res.headers);
     const session = await call(adminSession, "GET", "/api/admin/session", { cookie: staffCookie });
     expect(session.body).toEqual({ authenticated: true, email: TEST_ADMIN.email });
+  });
+
+  it("logs out by clearing the cookie", async () => {
+    const res = await call(adminSession, "DELETE", "/api/admin/session", { cookie: staffCookie });
+    expect(res.headers.get("set-cookie")).toContain("Max-Age=0");
   });
 
   it("rejects a tampered cookie", async () => {
