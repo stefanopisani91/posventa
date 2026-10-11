@@ -488,6 +488,14 @@ button {
   color: var(--muted);
   text-decoration: underline;
 }
+.footer__credit {
+  margin-top: 8px;
+  color: var(--text-2);
+}
+.footer__legal .footer__credit a {
+  color: var(--text);
+  font-weight: 600;
+}
 
 /* ---------- building blocks ---------- */
 

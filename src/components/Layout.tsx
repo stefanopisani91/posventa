@@ -10,7 +10,10 @@ import { LanguageSelect } from "./LanguageSelect.tsx";
 import { Logo } from "./Logo.tsx";
 import { ErrorState, Loading } from "./ui.tsx";
 
-const REPO_URL: string | undefined = import.meta.env.VITE_REPO_URL;
+const REPO_URL: string =
+  (import.meta.env.VITE_REPO_URL as string | undefined) ?? "https://github.com/stefanopisani91/posventa";
+const AUTHOR_NAME = "Stefano Pisani";
+const AUTHOR_URL = "https://github.com/stefanopisani91";
 const CEC_URL =
   "https://portal-cec.consumo.gob.es/sites/default/files/documentos/FOLLETO_DERECHO_DESISTIMIENTO_JULIO_2026.pdf";
 
@@ -61,15 +64,16 @@ function Footer() {
         <p>{t("footer.demo")}</p>
         <p>{t("footer.legal")}</p>
         <p>
-          {t("footer.builtWith")}
-          {REPO_URL && (
-            <>
-              {" "}
-              <a href={REPO_URL} target="_blank" rel="noreferrer">
-                {t("footer.code")} <Icon name="external" size={12} />
-              </a>
-            </>
-          )}
+          {t("footer.builtWith")}{" "}
+          <a href={REPO_URL} target="_blank" rel="noreferrer">
+            {t("footer.code")} <Icon name="external" size={12} />
+          </a>
+        </p>
+        <p className="footer__credit">
+          {t("footer.credit")}{" "}
+          <a href={AUTHOR_URL} target="_blank" rel="noreferrer">
+            {AUTHOR_NAME} <Icon name="external" size={12} />
+          </a>
         </p>
       </div>
     </footer>

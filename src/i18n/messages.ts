@@ -27,6 +27,7 @@ const en = {
   "footer.cec": "European Consumer Centre Spain",
   "footer.project": "Project",
   "footer.builtWith": "Built with React, Netlify Functions and Netlify Database.",
+  "footer.credit": "Built by",
 
   "common.loading": "Loading…",
   "common.retry": "Try again",
@@ -371,6 +372,7 @@ const es: Messages = {
   "footer.cec": "Centro Europeo del Consumidor en España",
   "footer.project": "Proyecto",
   "footer.builtWith": "Hecho con React, Netlify Functions y Netlify Database.",
+  "footer.credit": "Realizado por",
 
   "common.loading": "Cargando…",
   "common.retry": "Reintentar",
@@ -712,6 +714,7 @@ const it: Messages = {
   "footer.cec": "Centro Europeo del Consumatore in Spagna",
   "footer.project": "Progetto",
   "footer.builtWith": "Fatto con React, Netlify Functions e Netlify Database.",
+  "footer.credit": "Realizzato da",
 
   "common.loading": "Caricamento…",
   "common.retry": "Riprova",

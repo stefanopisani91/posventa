@@ -1,9 +1,9 @@
 # Design review — 11 October 2026
 
-After the visual redesign, four reviewer agents looked at the app from four angles,
-each working from the same 36 screenshots (light/dark × desktop 1280 px/phone 390 px)
-plus the running app, and each wrote a findings file with concrete fixes. This page
-records what was applied, what was deliberately not, and what is left.
+After the visual redesign, the app was reviewed from four angles, each pass working
+from the same 36 screenshots (light/dark × desktop 1280 px/phone 390 px) plus the
+running app and producing a list of findings with concrete fixes. This page records
+what was applied, what was deliberately not, and what is left.
 
 | Lens | What it measured | Findings (H/M/L) |
 | --- | --- | --- |
@@ -37,17 +37,17 @@ records what was applied, what was deliberately not, and what is left.
 - Corner radii reduced to three steps (8 / 12 / 16 px).
 - Logo gradient uses literal colours so the mark does not re-tint in dark mode.
 
-**Accessibility** (every number measured by the reviewer on real elements, light and dark)
+**Accessibility** (every number measured on real elements, light and dark)
 - Muted text darkened (`#6b7489` → `#5f6980`): it was 4.29:1 on the page background and 4.40:1 on cards — the only axe violation in the app, on 5 of 7 routes; now ≥ 5.0:1 everywhere.
 - Dark mode: placeholders styled (were the browser default at 3.70:1); the "reject" button, the rejected step and the success check used white on pale "ink" tokens (1.7–1.9:1) — an `-ink` background now always takes its `-bg` colour as foreground (≥ 6.5:1 in both themes).
 - Hero figure labels in solid white on darker chips (one label had dropped to 4.38:1 on phones).
 - Field borders at 3:1 (`--field-border`), meter tracks outlined, the weaker warranty strength and the partial month drawn as a hatch so they are not told apart by lightness alone.
 - `Field` now wires `aria-describedby` and `aria-invalid` to its control (errors were visible but not announced); KPI filter buttons expose `aria-pressed` and the group has a name; the chart tooltip is hoverable and closes with Escape; the monthly chart is one tab stop with arrow keys (the page had 47); bar rows are no longer focusable; landmark labels are translated; logos are decorative inside links; the login panel title is no longer an `h2` above the `h1`; table roles survive the phone card layout; links are underlined, not colour-only.
-- Verified by the reviewer and left as is: a visible, unclipped focus ring on all 111 tab stops per theme (4.4:1 light, 8.6:1 dark), reduced motion honoured, `<html lang>` follows the language switch, one `h1` per page, every control labelled, no horizontal scroll at 390 px, 16 px text on every form control (no iOS zoom).
+- Verified and left as is: a visible, unclipped focus ring on all 111 tab stops per theme (4.4:1 light, 8.6:1 dark), reduced motion honoured, `<html lang>` follows the language switch, one `h1` per page, every control labelled, no horizontal scroll at 390 px, 16 px text on every form control (no iOS zoom).
 
 ## Not applied, and why
 
-- **Drop the login brand panel entirely** (visual review, preferred option). Kept, content-height: it is the only place the brand voice appears on the staff side, and the owner asked for a richer look. Hidden on phones, where it was pushing the form below the fold.
+- **Drop the login brand panel entirely** (visual review, preferred option). Kept, content-height: it is the only place the brand voice appears on the staff side, and the goal was a richer look. Hidden on phones, where it was pushing the form below the fold.
 - **"Previous period" deltas, on-time closure rate, median/p90 closing time, refunded €** (charts review). Need new backend queries; listed as next steps in the README rather than rushed in.
 - **Use the chart orange for every warranty icon** (charts review). The chart series orange is reserved for data marks; decorative warranty icons stay amber. The type tag icons in the queue do use the series colours so the chart and the list agree.
 - **A dedicated `ClaimCard` component for phones** (mobile review). The CSS-only card reaches the same result (≈150 px per request, whole card tappable) without a second rendering path to keep in sync.

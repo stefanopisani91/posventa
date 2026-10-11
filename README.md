@@ -94,10 +94,10 @@ Dates are generated relative to the day the data is restored, so these situation
 - Typeface: Manrope, bundled with the app (no requests to Google Fonts from EU visitors).
 - Charts are plain HTML/CSS with a legend, a hover/keyboard tooltip and a table view; the two series
   colours were validated for colour-vision deficiency in both themes.
-- The design was reviewed by four independent reviewer agents (visual/brand, mobile, accessibility,
-  charts & dashboard) working from 36 screenshots and the running app; what was applied, what was not
-  and why is in [docs/design-review.md](docs/design-review.md). Contrast was measured on real elements
-  in both themes and the app was checked with axe-core on every page.
+- The design went through four review passes (visual/brand, mobile, accessibility, charts &
+  dashboard) over 36 screenshots and the running app; what was applied, what was not and why is in
+  [docs/design-review.md](docs/design-review.md). Contrast was measured on real elements in both
+  themes and the app was checked with axe-core on every page.
 
 ## Spanish legal rules
 
@@ -325,6 +325,8 @@ and applies the migrations. It runs on Netlify's free plan.
 - Photo uploads for defects; return-label generation; public holidays in deadline calculations.
 - Staff messages to customers are written in Spanish only.
 
----
+## Author
 
-I defined the requirements and reviewed the result; the code was written by directing AI agents (Claude Code).
+Posventa was made by **[Stefano Pisani](https://github.com/stefanopisani91)** in collaboration with
+[Claude Code](https://claude.com/claude-code). Product, legal rules, design direction and every
+decision in this repository are mine; Claude Code was the pair programmer I wrote the code with.

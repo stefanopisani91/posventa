@@ -22,6 +22,3 @@ blob-report/
 *.log
 .vscode/*
 !.vscode/extensions.json
-
-# personal hand-over note (see DECISIONS.md D2)
-MORNING.md
